@@ -22,9 +22,14 @@ spec:
           value: "db"
         - name: DB_PASSWORD
           value: "root_password"
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         ports:
         - containerPort: 5000
         - containerPort: 50051
+        - containerPort: 8000
 ---
 apiVersion: v1
 kind: Service
@@ -40,6 +45,9 @@ spec:
   - port: 50051
     name: grpc
     targetPort: 50051
+  - port: 8000
+    name: metrics
+    targetPort: 8000
 
 ---
 # --- Data Collector ---
@@ -70,9 +78,14 @@ spec:
           value: "hentoo-api-client"
         - name: OPENSKY_PASSWORD
           value: "gB9yg2q5f2qoe4BCq7L1NWI3yucq5qLB"
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         ports:
         - containerPort: 5000
         - containerPort: 50052
+        - containerPort: 8000
 ---
 apiVersion: v1
 kind: Service
@@ -88,6 +101,9 @@ spec:
   - port: 50052
     name: grpc
     targetPort: 50052
+  - port: 8000
+    name: metrics
+    targetPort: 8000
 
 ---
 # --- Alert System ---

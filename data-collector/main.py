@@ -12,8 +12,20 @@ import user_manager_pb2
 import user_manager_pb2_grpc
 import data_collector_pb2
 import data_collector_pb2_grpc
+from prometheus_client import start_http_server, Gauge, Counter
 
-            
+
+NODE_NAME = os.getenv('NODE_NAME', 'unknown_node')
+SERVICE_NAME = 'data_collector'
+DB_UPDATE_DURATION = Gauge('flight_db_update_duration_seconds', 'Duration of flight data update in seconds', ['service','node'])
+
+TOTAL_FLIGHTS_FETCHED = Counter('total_flights_fetched', 'Total number of flights fetched', ['service','node'])
+
+CPU_USAGE = Gauge('data_collector_cpu_usage_percent', 'CPU usage percentage of Data Collector service', ['service','node'])
+
+def start_metrics_server():
+    start_http_server(8000)
+    print("Prometheus metrics server started on port 8000", flush=True)
 
 print("Starting Data Collector Service...")
 app = flask.Flask(__name__)
@@ -63,40 +75,45 @@ def check_user_exists(email):
     return True
 def update_flight_data():
     print("--- Avvio aggiornamento ciclico voli ---")
-    airports = users_interests_collection.distinct("airport_code")
-    if not airports:
-        print("Nessun aeroporto da monitorare.")
-        return
-    sv ={}
-    for airport in airports:
-        print(f"Scaricamento dati per: {airport}...")
-       
-       
-        flightsArrival = collector.get_arrivals_by_airport(airport, hours_back=24*days)
-        if flightsArrival:
-            try:
-                for f in flightsArrival:
-                    f['airport_monitored'] = airport
-                print(f"volo in arrivi: {flightsArrival}")
-                flights_collection_arrival.insert_many(flightsArrival)
-                print(f"Salvati {len(flightsArrival)} voli arrivo per {airport}")
-            except Exception as e:
-                print(f"Errore salvataggio Mongo arrival: {e}")
+    with DB_UPDATE_DURATION.labels(service=SERVICE_NAME, node=NODE_NAME).time():
+        airports = users_interests_collection.distinct("airport_code")
+        if not airports:
+            print("Nessun aeroporto da monitorare.")
+            return
+        total_flight_count=0
+        sv ={}
+        for airport in airports:
+            print(f"Scaricamento dati per: {airport}...")
         
-        flightsDepartures = collector.get_departures_by_airport(airport, hours_back=24*days)
-        if flightsDepartures:
-            try:
-                for f in flightsDepartures:
-                    f['airport_monitored'] = airport
-                flights_collection_departure.insert_many(flightsDepartures)
-                print(f"Salvati {len(flightsDepartures)} voli partenza per {airport}")
-            except Exception as e:
-                print(f"Errore salvataggio Mongo departures: {e}")
-        sv[airport] = {
-            "arrivals": flightsArrival,
-            "departures": flightsDepartures,
-            'users' : list(users_interests_collection.find({'airport_code': airport}))
-        }
+        
+            flightsArrival = collector.get_arrivals_by_airport(airport, hours_back=24*days)
+            if flightsArrival:
+                total_flight_count += len(flightsArrival)
+                try:
+                    for f in flightsArrival:
+                        f['airport_monitored'] = airport
+                    print(f"volo in arrivi: {flightsArrival}")
+                    flights_collection_arrival.insert_many(flightsArrival)
+                    print(f"Salvati {len(flightsArrival)} voli arrivo per {airport}")
+                except Exception as e:
+                    print(f"Errore salvataggio Mongo arrival: {e}")
+            
+            flightsDepartures = collector.get_departures_by_airport(airport, hours_back=24*days)
+            if flightsDepartures:
+                total_flight_count += len(flightsDepartures)
+                try:
+                    for f in flightsDepartures:
+                        f['airport_monitored'] = airport
+                    flights_collection_departure.insert_many(flightsDepartures)
+                    print(f"Salvati {len(flightsDepartures)} voli partenza per {airport}")
+                except Exception as e:
+                    print(f"Errore salvataggio Mongo departures: {e}")
+            sv[airport] = {
+                "arrivals": flightsArrival,
+                "departures": flightsDepartures,
+                'users' : list(users_interests_collection.find({'airport_code': airport}))
+            }
+        TOTAL_FLIGHTS_FETCHED.labels(service=SERVICE_NAME, node=NODE_NAME).inc(total_flight_count)
     producer.send_message({"status": "success", "message": "Flight data updated", "data": sv})
 
 
@@ -370,8 +387,12 @@ def get_average_flights():
     return flask.jsonify({'status': 'success', 'average_flights_per_day_arrival': average_per_day_arrival ,  'average_flights_per_day_departure': average_per_day_departure }), 200
 
 if __name__ == '__main__':
+    start_metrics_server()
+
+    CPU_USAGE.labels(service=SERVICE_NAME, node=NODE_NAME).set_function(lambda: os.getloadavg()[0] * 10)
+
     grpc_thread = threading.Thread(target=run_grpc_server)
     grpc_thread.start()
 
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
 

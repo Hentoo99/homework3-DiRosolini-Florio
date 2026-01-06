@@ -5,3 +5,4 @@ SQLAlchemy
 Flask-SQLAlchemy
 mysql.connector
 protobuf
+prometheus_client
