@@ -1,0 +1,263 @@
+{
+	"info": {
+		"_postman_id": "314b1c00-8017-43cd-bc0b-23b5841e0d72",
+		"name": "data-collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50293053",
+		"_collection_link": "https://gabrieleflorio01-6860758.postman.co/workspace/Gabriele-Florio's-Workspace~6c6119da-6e08-48b7-8fc1-34c8bdd0e398/collection/50293053-314b1c00-8017-43cd-bc0b-23b5841e0d72?action=share&source=collection_link&creator=50293053"
+	},
+	"item": [
+		{
+			"name": "add_interest",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\" : \"gabrieleflorio01@gmail.com\",\n    \"airport_code\": \"LIML\",\n    \"lowValue\" : 2,\n    \"highValue\": 5\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/data-collector/add_interest",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"data-collector",
+						"add_interest"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_flight",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\" : \"gabrieleflorio01@gmail.com\",\n    \"airport_code\": \"LIML\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/data-collector/get_flight",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"data-collector",
+						"get_flight"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list_interest",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\" : \"gabrieleflorio01@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/data-collector/list_interests",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"data-collector",
+						"list_interests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "rmv_interest",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\" : \"gabrieleflorio01@gmail.com\",\n    \"airport_code\": \"LICC\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/data-collector/rmv_interest",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"data-collector",
+						"rmv_interest"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "force_update",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/data-collector/force_update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"data-collector",
+						"force_update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_last_flight",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\" : \"gabrieleflorio01@gmail.com\",\n    \"airport_code\": \"LICC\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/data-collector/get_last_flight",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"data-collector",
+						"get_last_flight"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "average",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\" : \"gabrieleflorio01@gmail.com\",\n    \"airport_code\": \"LICC\",\n    \"days\": 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/data-collector/average",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"data-collector",
+						"average"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_arrivals",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\" : \"gabrieleflorio01@gmail.com\",\n    \"airport_code_arrivals\": \"LICC\",\n    \"airport_code_departures\" : \"LMML\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/data-collector/get_arrivals",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"data-collector",
+						"get_arrivals"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "modify_interest_param",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" : \"enricomariadr99@gmail.com\",\r\n    \"airport_code\": \"LICC\",\r\n    \"lowValue\" : 1,\r\n    \"highValue\": 11\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/data-collector/modify_interest_param",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"data-collector",
+						"modify_interest_param"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

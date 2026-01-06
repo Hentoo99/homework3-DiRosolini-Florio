@@ -1,0 +1,7 @@
+flask
+grpcio
+grpcio-tools
+SQLAlchemy
+Flask-SQLAlchemy
+mysql.connector
+protobuf

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+service DataCollector {
+    rpc RemoveInterestbyUser (UserRequest) returns (DataCollectorResponse);
+}
+
+message UserRequest {
+    string email = 1;
+}
+message DataCollectorResponse {
+    bool success = 1;
+}

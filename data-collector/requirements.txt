@@ -1,0 +1,8 @@
+flask
+grpcio
+grpcio-tools
+pymongo
+requests
+APScheduler
+protobuf
+confluent_kafka
