@@ -6,7 +6,7 @@ import sys
 from concurrent import futures
 import grpc
 import threading
-sys.path.append(os.path.join(os.getcwd(), 'proto')) # FONDAMENTALE
+sys.path.append(os.path.join(os.getcwd(), 'proto'))
 
 import user_manager_pb2       
 import user_manager_pb2_grpc  
@@ -22,17 +22,17 @@ DB_NAME = 'user_db'
 
 NODE_NAME = os.getenv('NODE_NAME', 'unknown_node')
 SERVICE_NAME = 'user_manager'
-DB_UPDATE_DURATION = Gauge('user_manager_db_update_duration_seconds', 'Duration of user update in seconds', ['service','node'])
 
+DB_UPDATE_DURATION = Gauge('user_manager_db_update_duration_seconds', 'Duration of user update in seconds', ['service','node'])
 TOTAL_USER = Gauge('total_user', 'Total number of user inserted', ['service','node'])
 ERRORS = Counter('user_manager_errors_total', 'Total number of errors in User Manager service', ['service','node'])
-
 CPU_USAGE = Gauge('user_manager_cpu_usage_percent', 'CPU usage percentage of User Manager service', ['service','node'])
-
 GRPC_CHECKS = Counter('user_manager_grpc_checks_total', 'Total number of gRPC user existence checks', ['service','node'])
 
 cache= {}
 cache_lock = threading.Lock()
+app = flask.Flask(__name__)
+
 
 def start_metrics_server():
     start_http_server(8000)
@@ -46,7 +46,6 @@ class UserManagerServicer(user_manager_pb2_grpc.UserManagerServicer):
         exists = get_is_inserted(data)
         print(f"User exists: {exists}")
         return user_manager_pb2.CheckUserExistsResponse(exists=exists)
-app = flask.Flask(__name__)
 
 
 def get_is_inserted(data):
@@ -105,15 +104,12 @@ def home():
 @app.route('/add_user', methods=['POST'])
 def add_user():
     with DB_UPDATE_DURATION.labels(service=SERVICE_NAME, node=NODE_NAME).time():
-        db_conn = get_db_connection()
         try:
             global cache
-            print("Received data for new user")
+            db_conn = get_db_connection()
             data = flask.request.json
             request_id = data['request_id'] 
-            print(f"Processing request ID: {request_id}")
-            print(f"Cache: {cache}")
-            print(f"Request ID: {request_id}")
+
             if not request_id:
                     ERRORS.labels(service=SERVICE_NAME, node=NODE_NAME).inc()
                     return flask.jsonify({"status": "Missing request_id"}), 400
@@ -124,16 +120,13 @@ def add_user():
             
             if(db_conn.is_connected()):
                 if not get_is_inserted(flask.request.json):
-                    print("Adding new user to the database")
                     cursor =  db_conn.cursor()
-                    
                     QUERY = "INSERT INTO users (email, name, surname, age, CF, phone) VALUES (%s, %s, %s, %s, %s, %s)"
                     valori = (data['email'], data['name'], data['surname'], data['age'], data['CF'], data['phone'])
                     cursor.execute(QUERY, valori)
                     db_conn.commit()
                     if cursor.rowcount > 0:
                         response = "User added successfully"
-                        
                         TOTAL_USER.labels(service=SERVICE_NAME, node=NODE_NAME).inc()
                     with cache_lock:
                         cache[request_id] = {
@@ -143,6 +136,9 @@ def add_user():
                     return flask.jsonify({"status": response, "user": data})
                 return flask.jsonify({"status": "User already exists", "user": flask.request.json})
             return flask.jsonify({"status": "DB not connected"})
+        except Exception as e:
+            ERRORS.labels(service=SERVICE_NAME, node=NODE_NAME).inc()
+            return flask.jsonify({"status": "Error adding user", "error": str(e)})
         finally:
             if db_conn.is_connected():
                 db_conn.close()
@@ -166,6 +162,9 @@ def get_user():
                 return flask.jsonify({"status": "User found", "user": result})
             return flask.jsonify({"status": "User not found", "email": data['email']})
         return flask.jsonify({"status": "DB not connected"})
+    except Exception as e:
+        ERRORS.labels(service=SERVICE_NAME, node=NODE_NAME).inc()
+        return flask.jsonify({"status": "Error retrieving user", "error": str(e)})
     finally:
         if db_conn.is_connected():
             db_conn.close()

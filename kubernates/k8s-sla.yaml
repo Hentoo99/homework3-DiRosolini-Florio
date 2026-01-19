@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sla-config-map
+data:
+  sla_config.yaml: |
+    metrics:
+      - name: "cpu_usage_high_user_manager"
+        query: "user_manager_cpu_usage_percent"
+        min: 0
+        max: 1
+      - name: "db_update_slow_data_collector"
+        query: "flight_db_update_duration_seconds"
+        min: 0
+        max: 10.0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sla-breach-detector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sla-breach-detector
+  template:
+    metadata:
+      labels:
+        app: sla-breach-detector
+    spec:
+      containers:
+      - name: sla-breach-detector
+        image: sla-breach-detector:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+        env:
+        - name: PROMETHEUS_URL
+          value: "http://prometheus:9090"
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka-service:9092"
+        - name: SLA_CONFIG_PATH
+          value: "/app/config/sla_config.yaml"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: sla-config-map
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sla-breach-detector
+spec:
+  selector:
+    app: sla-breach-detector
+  ports:
+  - port: 5000
+    targetPort: 5000

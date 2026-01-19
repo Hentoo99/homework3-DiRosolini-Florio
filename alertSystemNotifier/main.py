@@ -14,7 +14,7 @@ GROUP_ID = 'alert_notifier_group'
 SMTP_SERVER = os.getenv('SMTP_SERVER', 'smtp.gmail.com') 
 SMTP_PORT = int(os.getenv('SMTP_PORT', '465'))          
 SENDER_EMAIL = os.getenv('SENDER_EMAIL', 'gabrieleflorio18@gmail.com')
-SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', 'cugo drbr livg hefd')
+SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', 'ggia fxdd lyon utkw')
 
 consumer_config = {
     'bootstrap.servers': BOOTSTRAP_SERVERS,
@@ -37,24 +37,40 @@ def wait_for_kafka():
             time.sleep(5)
 
 def send_email(data):
+    
     msg = EmailMessage()
     print(data)
     print(type(data))
-    msg['Subject'] = f"NOTIFICA: {data.get('airport', 'Un aeroporto')} ha molti voli!"
-    msg['From'] = SENDER_EMAIL
-    msg['To'] = data.get('user')
-    
-    content = f"""
-    Ciao,
-    è stata rilevata una variazione significativa nel numero di voli presso l'aeroporto {data.get('airport', 'unknown')}.
-    Valore di interesse attuale: {data.get('interestValue', 'unknown')}, ha superato le tue soglie impostate.
-    In particolare: {data.get('condition', 'unknown')}
-    Ti consigliamo di controllare i dettagli.
-    Saluti,
-    Il team di Alert System
-    """
+    if("airport" in data ):
+        msg['Subject'] = f"NOTIFICA: {data.get('airport', 'Un aeroporto')} ha molti voli!"
+        msg['From'] = SENDER_EMAIL
+        msg['To'] = data.get('user')
+        
+        content = f"""
+        Gentile Utente,
+        è stata rilevata una variazione significativa nel numero di voli presso l'aeroporto {data.get('airport', 'unknown')}.
+        Valore di interesse attuale: {data.get('interestValue', 'unknown')}, ha superato le tue soglie impostate.
+        In particolare: {data.get('condition', 'unknown')}
+        Ti consigliamo di controllare i dettagli.
+        Saluti,
+        Il team di Alert System
+        """
+        
+    elif(data['type'] == 'SLA_VIOLATION'):
+        msg['Subject'] = f"NOTIFICA: Violazione SLA per la metrica {data.get('metric', 'unknown')}"
+        msg['From'] = SENDER_EMAIL
+        msg['To'] = "gabrieleflorio01@gmail.com"
+        
+        content = f"""
+        Gentile Amministratore,
+        è stata rilevata una violazione della SLA per la metrica {data.get('metric', 'unknown')}.
+        Valore riscontrato: {data.get('value', 'unknown')}, che non rientra nell'intervallo consentito [{data.get('min', 'unknown')}, {data.get('max', 'unknown')}].
+        Timestamp dell'evento: {data.get('timestamp', 'unknown')}
+        Ti consigliamo di prendere le misure necessarie per risolvere il problema.
+        Saluti,
+        Il team di Alert System
+        """
     msg.set_content(content)
-
     context = ssl.create_default_context()
 
     try:
@@ -109,7 +125,7 @@ if __name__ == "__main__":
                     print("Email inviata con successo.")
                 consumer.commit_offsets() 
                 print("Offset committato.")
-                print("--------------------------")        
+                print("--------------------------") 
     except KeyboardInterrupt:
         print("Arresto manuale ricevuto.")
     finally:
