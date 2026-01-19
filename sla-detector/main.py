@@ -151,13 +151,12 @@ def loop_check():
 
         sleep(T_CHECK)
 
-# --- AVVIO ---
+
 
 if __name__ == "__main__":
     load_sla_config()
 
     kafka_producer = KafkaProducerWrapper(TOPIC)
-    # Avvia il loop in un thread separato altrimenti Flask blocca tutto
     monitor_thread = threading.Thread(target=loop_check, daemon=True)
     monitor_thread.start()
 
