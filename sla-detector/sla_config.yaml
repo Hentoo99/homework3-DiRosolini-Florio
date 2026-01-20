@@ -1,5 +1,5 @@
 metrics:
-  - name: cpu_usage_high_user_manager
+  - name: "cpu_usage_high_user_manager"
     query: "user_manager_cpu_usage_percent"
     min: 0
     max: 0.00000000000001 

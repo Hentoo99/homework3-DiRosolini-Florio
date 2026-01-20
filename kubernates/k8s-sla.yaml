@@ -8,7 +8,7 @@ data:
       - name: "cpu_usage_high_user_manager"
         query: "user_manager_cpu_usage_percent"
         min: 0
-        max: 1
+        max: 10
       - name: "db_update_slow_data_collector"
         query: "flight_db_update_duration_seconds"
         min: 0
