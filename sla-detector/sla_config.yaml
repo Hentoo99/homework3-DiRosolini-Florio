@@ -8,3 +8,8 @@ metrics:
     query: "flight_db_update_duration_seconds"
     min: 5
     max: 5.0 
+
+  - name: "circuit_breaker_rejections"
+    query: "circuit_breaker_rejections_total"
+    min: 0
+    max: 20

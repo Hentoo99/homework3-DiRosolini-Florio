@@ -28,6 +28,7 @@ TOTAL_USER = Gauge('total_user', 'Total number of user inserted', ['service','no
 ERRORS = Counter('user_manager_errors_total', 'Total number of errors in User Manager service', ['service','node'])
 CPU_USAGE = Gauge('user_manager_cpu_usage_percent', 'CPU usage percentage of User Manager service', ['service','node'])
 GRPC_CHECKS = Counter('user_manager_grpc_checks_total', 'Total number of gRPC user existence checks', ['service','node'])
+CACHE_SIZE = Gauge('deduplication_cache_size', 'Current number of entries in the request deduplication cache', ['service', 'node'])
 
 cache= {}
 cache_lock = threading.Lock()
@@ -108,7 +109,8 @@ def add_user():
             global cache
             db_conn = get_db_connection()
             data = flask.request.json
-            request_id = data['request_id'] 
+            request_id = data['request_id']
+            
 
             if not request_id:
                     ERRORS.labels(service=SERVICE_NAME, node=NODE_NAME).inc()
@@ -133,6 +135,7 @@ def add_user():
                             "response": response,
                             "timestamp": time.time()
                         }
+                        CACHE_SIZE.labels(service=SERVICE_NAME, node=NODE_NAME).set(len(cache)) 
                     return flask.jsonify({"status": response, "user": data})
                 return flask.jsonify({"status": "User already exists", "user": flask.request.json})
             return flask.jsonify({"status": "DB not connected"})
@@ -209,7 +212,7 @@ if __name__ == '__main__':
     start_metrics_server()
 
     CPU_USAGE.labels(service=SERVICE_NAME, node=NODE_NAME).set_function(lambda: os.getloadavg()[0] * 10)
-
+    CACHE_SIZE.labels(service=SERVICE_NAME, node=NODE_NAME).set(0)
     server = threading.Thread(target=run_grpc_server)
     server.start()
     app.run(host='0.0.0.0', port=5000, debug=False)

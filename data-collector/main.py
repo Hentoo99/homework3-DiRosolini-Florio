@@ -17,11 +17,13 @@ from prometheus_client import start_http_server, Gauge, Counter
 
 NODE_NAME = os.getenv('NODE_NAME', 'unknown_node')
 SERVICE_NAME = 'data_collector'
+
 DB_UPDATE_DURATION = Gauge('flight_db_update_duration_seconds', 'Duration of flight data update in seconds', ['service','node'])
-
 TOTAL_FLIGHTS_FETCHED = Counter('total_flights_fetched', 'Total number of flights fetched', ['service','node'])
-
 CPU_USAGE = Gauge('data_collector_cpu_usage_percent', 'CPU usage percentage of Data Collector service', ['service','node'])
+KAFKA_MESSAGES_SENT = Counter('kafka_messages_sent_total', 'Total Kafka messages sent', ['service', 'node', 'topic'])
+LAST_UPDATE_TIMESTAMP = Gauge('last_successful_update_timestamp', 'Unix timestamp of the last successful flight data update', ['service', 'node'])
+
 
 def start_metrics_server():
     start_http_server(8000)
@@ -115,7 +117,9 @@ def update_flight_data():
             }
         TOTAL_FLIGHTS_FETCHED.labels(service=SERVICE_NAME, node=NODE_NAME).inc(total_flight_count)
     producer.send_message({"status": "success", "message": "Flight data updated", "data": sv})
-
+    KAFKA_MESSAGES_SENT.labels(service=SERVICE_NAME, node=NODE_NAME, topic='to-alert-system').inc()
+    LAST_UPDATE_TIMESTAMP.labels(service=SERVICE_NAME, node=NODE_NAME).set(time.time())
+    print("Timestamp ultimo aggiornamento registrato.")
 
 def checkInterestExists(email, airport_code):
     result = users_interests_collection.find_one({'email': email, 'airport_code': airport_code})

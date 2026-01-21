@@ -1,8 +1,9 @@
 import requests
 import time
 import os
-from flask import jsonify
+from flask import jsonify  
 import circuitBreaker
+from prometheus_client import Counter
 
 CLIENT_ID = os.environ.get('OPENSKY_USERNAME')
 CLIENT_SECRET = os.environ.get('OPENSKY_PASSWORD')
@@ -10,8 +11,12 @@ CLIENT_SECRET = os.environ.get('OPENSKY_PASSWORD')
 AUTH_URL = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token"
 API_BASE_URL = "https://opensky-network.org/api"
 
-cb = circuitBreaker.CircuitBreaker(failure_threshold=3, recovery_timeout=1)
+NODE_NAME = os.getenv('NODE_NAME', 'unknown_node')
+SERVICE_NAME = 'data_collector'
 
+cb = circuitBreaker.CircuitBreaker(failure_threshold=3, recovery_timeout=1)
+CB_REJECTIONS = Counter('circuit_breaker_rejections_total', 'Number of requests rejected mainly because Circuit Breaker was OPEN', ['service', 'target_host']
+)
 def get_access_token():
   
     if not CLIENT_ID or not CLIENT_SECRET:
@@ -81,6 +86,9 @@ def opensky_api_request(airport_code, hours_back, flight_type):
             print(f"Ricevuti {len(data)} voli dal chunk {sv} to {timeSv}")
             flights.extend(data)
         except Exception as e:
+            if isinstance(e, circuitBreaker.CircuitBreakerOpenException):
+                print(">>> Incremento metrica Prometheus: CB_REJECTIONS")
+                CB_REJECTIONS.labels(service=SERVICE_NAME, target_host='opensky').inc()
             print(f"Errore durante la chiamata OpenSky API: {e}")
 
         timeSv = sv
