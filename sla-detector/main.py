@@ -14,7 +14,7 @@ TOPIC = 'to-notifier'
 PROMETHEUS_URL = os.getenv("PROMETHEUS_URL", "http://prometheus:9090")
 SLA_CONFIG_PATH = os.getenv("SLA_CONFIG_PATH", "/app/config/sla_config.yaml")
 CHECK_INTERVAL = int(os.getenv("CHECK_INTERVAL", "20"))
-T_SCRAPE= 15
+T_SCRAPE= 5
 T_CHECK = 5*T_SCRAPE 
 number_errors = 3
 history = {} 
@@ -144,14 +144,16 @@ def loop_check():
 
                 if counter_low[name] >= 3:
                     print(f"Trigger SLA violation per {name} BELOW_MIN")
-                    trigger_sla_violation(name, values_violated[name]['low'], min_v, max_v, "BELOW_MIN")
+                    low_values = [item["current_val"] for item in values_violated[name]['low']]
+                    trigger_sla_violation(name, low_values, min_v, max_v, "BELOW_MIN")
                     counter_low[name] = 0
                     breach_counts[name] += 1
                     values_violated[name]['low'].clear()
                     sv[name] = 0
                 elif counter_high[name] >= 3:
                     print(f"Trigger SLA violation per {name} ABOVE_MAX")    
-                    trigger_sla_violation(name, values_violated[name]['high'], min_v, max_v, "ABOVE_MAX")
+                    high_values = [item["current_val"] for item in values_violated[name]['high']]
+                    trigger_sla_violation(name, high_values, min_v, max_v, "ABOVE_MAX")
                     counter_high[name] = 0
                     breach_counts[name] += 1
                     values_violated[name]['high'].clear()
@@ -214,10 +216,10 @@ def check_status():
             if m['name'] == data.get("metric"):
                 name = m['name']
                 if name in history and breach_counts[name] > 0:
-                    return flask.jsonify({"history": list(breach_counts[name])}), 200
+                    return flask.jsonify({"Breack per metrica: {name}": breach_counts[name]}), 200
                 else:
                     return flask.jsonify({"error": "No databreach for this metric"}), 404
-    return flask.jsonify({"history": list(breach_counts.values())}), 200
+    return flask.jsonify({"Breach per metrica": breach_counts}), 200
 
 if __name__ == "__main__":
     load_sla_config()

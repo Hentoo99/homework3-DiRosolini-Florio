@@ -30,9 +30,10 @@ class CircuitBreaker:
                 result = func(*args, **kwargs) 
             except self.expectedException as e:
                 print(f"Function raised an exception: {e}")
-                if e.response.status_code == 4044:
-                    print("Exception is 404 Not Found, will be ignored for circuit breaker")
-                    raise e
+                if hasattr(e, 'response') and hasattr(e.response, 'status_code'):
+                    if e.response.status_code == 404:
+                        print("Exception is 404 Not Found, will be ignored for circuit breaker")
+                        raise e
 
                 self.failureCount += 1
                 print(f"Failure count: {self.failureCount}")
