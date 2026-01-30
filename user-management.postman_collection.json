@@ -1,122 +1,122 @@
 {
-	"info": {
-		"_postman_id": "609cafcb-709f-44b3-8d58-25f6154489b7",
-		"name": "user-management",
-		"description": "### Welcome to Postman! This is your first collection.\n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests  \n• Test your API in real-world scenarios  \n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "50293053",
-		"_collection_link": "https://gabrieleflorio01-6860758.postman.co/workspace/Gabriele-Florio's-Workspace~6c6119da-6e08-48b7-8fc1-34c8bdd0e398/collection/50293053-609cafcb-709f-44b3-8d58-25f6154489b7?action=share&source=collection_link&creator=50293053"
-	},
-	"item": [
-		{
-			"name": "add_user",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Successful POST request\", function () {",
-							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-							"});",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"request_id\": 242123338214,\n    \"email\" : \"gabrieleflorio01@gmail.com\",\n    \"name\" : \"Enricomaria\",\n    \"surname\": \"Di Rosolini\",\n    \"age\" : 27,\n    \"CF\" : \"THGLIU99A13F343J\",\n    \"phone\": \"372837283\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/user-manager/add_user",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"user-manager",
-						"add_user"
-					]
-				},
-				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
-			},
-			"response": []
-		},
-		{
-			"name": "post get user",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"email\" : \"gabrieleflorio01@gmail.com\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/user-manager/get_user",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"user-manager",
-						"get_user"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "remove user",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"email\" : \"gabrieleflorio01@gmail.com\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/user-manager/rmv_user",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"user-manager",
-						"rmv_user"
-					]
-				}
-			},
-			"response": []
-		}
-	]
+  "info": {
+    "_postman_id": "609cafcb-709f-44b3-8d58-25f6154489b7",
+    "name": "user-management",
+    "description": "### Welcome to Postman! This is your first collection.\n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests  \n• Test your API in real-world scenarios  \n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50293053",
+    "_collection_link": "https://go.postman.co/collection/50293053-609cafcb-709f-44b3-8d58-25f6154489b7?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "add_user",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Successful POST request\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"request_id\": 122,\n    \"email\" : \"gabrieleflorio01@gmail.com\",\n    \"name\" : \"Enricomaria\",\n    \"surname\": \"Di Rosolini\",\n    \"age\" : 27,\n    \"CF\" : \"THGLIU99A13F343J\",\n    \"phone\": \"372837283\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/user-manager/add_user",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-manager",
+            "add_user"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "post get user",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\" : \"gabrieleflorio01@gmail.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/user-manager/get_user",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-manager",
+            "get_user"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "remove user",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\" : \"gabrieleflorio01@gmail.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/user-manager/rmv_user",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-manager",
+            "rmv_user"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
 }

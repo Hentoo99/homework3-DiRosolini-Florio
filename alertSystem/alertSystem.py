@@ -134,11 +134,16 @@ if __name__ == "__main__":
                             else:
                                 condition = f'lowValue = {user["lowValue"]}'
                             print(user)
+                            email_body = f"""
+                                Gentile Utente,
+                                Variazione significativa voli a {airport}.
+                                Valore attuale: {val}.
+                                Dettaglio: {condition}.
+                                """
                             producer.send_message({
-                                'user': user['email'],
-                                'airport': airport,
-                                'interestValue': val,
-                                'condition': condition
+                                "to": user['email'],
+                                "subject": f"ALERT VOLI: {airport}",
+                                "body": email_body
                             })
                         else:
                             print(f"Nessuna notifica inviata per l'utente {user['email']} all'aeroporto {airport}.")

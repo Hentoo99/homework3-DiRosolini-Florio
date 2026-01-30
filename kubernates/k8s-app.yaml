@@ -17,11 +17,19 @@ spec:
       - name: user-manager
         image: user-manager:latest
         imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        envFrom:
+        - configMapRef:
+            name: shared-config
+        - secretRef:
+            name: shared-secrets
         env:
-        - name: DB_HOST
-          value: "db"
-        - name: DB_PASSWORD
-          value: "root_password"
         - name: NODE_NAME
           valueFrom:
             fieldRef:
@@ -69,15 +77,19 @@ spec:
       - name: data-collector
         image: data-collector:latest
         imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        envFrom:
+        - configMapRef:
+            name: shared-config
+        - secretRef:
+            name: shared-secrets
         env:
-        - name: MONGO_URI
-          value: "mongodb://admin:password123@data-db:27017"
-        - name: KAFKA_BOOTSTRAP_SERVERS
-          value: "kafka-service:9092"
-        - name: OPENSKY_USERNAME
-          value: "hentoo-api-client"
-        - name: OPENSKY_PASSWORD
-          value: "gB9yg2q5f2qoe4BCq7L1NWI3yucq5qLB"
         - name: NODE_NAME
           valueFrom:
             fieldRef:
@@ -125,9 +137,18 @@ spec:
       - name: alert-system
         image: alert-system:latest
         imagePullPolicy: IfNotPresent
-        env:
-        - name: KAFKA_BOOTSTRAP_SERVERS
-          value: "kafka-service:9092"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+        envFrom:
+        - configMapRef:
+            name: shared-config
+        - secretRef:
+            name: shared-secrets
 
 ---
 # --- Alert Notifier ---
@@ -149,6 +170,15 @@ spec:
       - name: alert-notifier
         image: alert-notifier:latest
         imagePullPolicy: IfNotPresent
-        env:
-        - name: KAFKA_BOOTSTRAP_SERVERS
-          value: "kafka-service:9092"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+        envFrom:
+        - configMapRef:
+            name: shared-config
+        - secretRef:
+            name: shared-secrets

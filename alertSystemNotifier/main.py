@@ -37,51 +37,27 @@ def wait_for_kafka():
             time.sleep(5)
 
 def send_email(data):
-    
     msg = EmailMessage()
-    print(data)
-    print(type(data))
-    if("airport" in data ):
-        msg['Subject'] = f"NOTIFICA: {data.get('airport', 'Un aeroporto')} ha molti voli!"
-        msg['From'] = SENDER_EMAIL
-        msg['To'] = data.get('user')
-        
-        content = f"""
-        Gentile Utente,
-        è stata rilevata una variazione significativa nel numero di voli presso l'aeroporto {data.get('airport', 'unknown')}.
-        Valore di interesse attuale: {data.get('interestValue', 'unknown')}, ha superato le tue soglie impostate.
-        In particolare: {data.get('condition', 'unknown')}
-        Ti consigliamo di controllare i dettagli.
-        Saluti,
-        Il team di Alert System
-        """
-        
-    elif(data['type'] == 'SLA_VIOLATION'):
-        msg['Subject'] = f"NOTIFICA: Violazione SLA per la metrica {data.get('metric', 'unknown')}"
-        msg['From'] = SENDER_EMAIL
-        msg['To'] = "gabrieleflorio01@gmail.com"
-        
-        content = f"""
-        Gentile Amministratore,
-        è stata rilevata una violazione della SLA per la metrica {data.get('metric', 'unknown')}.
-        Valore riscontrato: {data.get('value', 'unknown')}, che non rientra nell'intervallo consentito [{data.get('min', 'unknown')}, {data.get('max', 'unknown')}].
-        Timestamp dell'evento: {data.get('timestamp', 'unknown')}
-        Ti consigliamo di prendere le misure necessarie per risolvere il problema.
-        Saluti,
-        Il team di Alert System
-        """
-    msg.set_content(content)
-    context = ssl.create_default_context()
+    
+    if not all(k in data for k in ("to", "subject", "body")):
+        print(f"ERRORE: Messaggio malformato ricevuto: {data}")
+        return False
 
+    msg['Subject'] = data['subject']
+    msg['From'] = SENDER_EMAIL
+    msg['To'] = data['to']
+    msg.set_content(data['body'])
+
+    context = ssl.create_default_context()
     try:
-        print(f"Tentativo invio email a {data.get('user')}...")
+        print(f"Invio email a {data['to']}...")
         with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
             server.login(SENDER_EMAIL, SENDER_PASSWORD)
             server.send_message(msg)
-        print("--- EMAIL INVIATA CON SUCCESSO ---")
+        print("--- EMAIL INVIATA ---")
         return True
     except Exception as e:
-        print(f"ERRORE invio email: {e}")
+        print(f"ERRORE SMTP: {e}")
         return False
 
 class KafkaConsumerWrapper:

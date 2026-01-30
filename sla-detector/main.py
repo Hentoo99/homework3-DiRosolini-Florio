@@ -13,10 +13,9 @@ BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka:9092')
 TOPIC = 'to-notifier' 
 PROMETHEUS_URL = os.getenv("PROMETHEUS_URL", "http://prometheus:9090")
 SLA_CONFIG_PATH = os.getenv("SLA_CONFIG_PATH", "/app/config/sla_config.yaml")
-CHECK_INTERVAL = int(os.getenv("CHECK_INTERVAL", "20"))
-T_SCRAPE= 5
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'gabrieleflorio01@gmail.com')
+T_SCRAPE= 15
 T_CHECK = 5*T_SCRAPE 
-number_errors = 3
 history = {} 
 breach_counts = Counter()
 app = flask.Flask(__name__)
@@ -80,15 +79,19 @@ def query_prometheus(query):
     return None,None
 
 def trigger_sla_violation(metric_name, value, min_val, max_val, breach_type):
+    email_body = f"""
+    Gentile Amministratore,
+    è stata rilevata una violazione SLA per {metric_name}.
+    Valore: {value} (Consentito: {min_val}-{max_val}).
+    Tipo violazione: {breach_type}.
+    Timestamp: {time()}
+    """
     message = {
-        "type": "SLA_VIOLATION",
-        "metric": metric_name,
-        "value": value,
-        "min": min_val,
-        "max": max_val,
-        "timestamp": time(),
-        "violation_type": breach_type
+        "to": ADMIN_EMAIL, 
+        "subject": f"CRITICO: Violazione SLA {metric_name}",
+        "body": email_body
     }
+
     print(f"prova: {kafka_producer}")
     print(f"prova2: {message}")
     if kafka_producer:
@@ -96,8 +99,7 @@ def trigger_sla_violation(metric_name, value, min_val, max_val, breach_type):
     print(f"!!! SLA VIOLATION: {metric_name} val={value} ({breach_type}) !!!")
 
 def loop_check():
-    print(f"Avvio loop di controllo SLA ogni {CHECK_INTERVAL} secondi...")
-    sleep(10)
+    print(f"Avvio loop di controllo SLA ogni {T_CHECK} secondi...")
     counter_low= Counter()
     counter_high = Counter()
     sv = Counter()
@@ -127,7 +129,6 @@ def loop_check():
                 history[name].append({"current_val": current_val, "current_timestamp": current_timestamp})
                 print("history", history[name])
                 print(f"Valore nella storia: {current_val}, min={min_v}, max={max_v}")
-                #sv[name] = len(history[name])
                 print(f"Valore di inlunghezza vett{sv[name]}")
 
 
@@ -216,7 +217,7 @@ def check_status():
             if m['name'] == data.get("metric"):
                 name = m['name']
                 if name in history and breach_counts[name] > 0:
-                    return flask.jsonify({"Breack per metrica: {name}": breach_counts[name]}), 200
+                    return flask.jsonify({f"Breach per metrica: {name}": breach_counts[name]}), 200
                 else:
                     return flask.jsonify({"error": "No databreach for this metric"}), 404
     return flask.jsonify({"Breach per metrica": breach_counts}), 200

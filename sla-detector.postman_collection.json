@@ -64,7 +64,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"email\" : \"gabrieleflorio00001@gmail.com\"\n}",
+          "raw": "{\n    \"metric\": \"cpu_usage_high_user_manager\"\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -72,15 +72,15 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8080/user-manager/get_user",
+          "raw": "http://localhost:8080/sla-detector/read_sla",
           "protocol": "http",
           "host": [
             "localhost"
           ],
           "port": "8080",
           "path": [
-            "user-manager",
-            "get_user"
+            "sla-detector",
+            "read_sla"
           ]
         }
       },
@@ -96,7 +96,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"email\" : \"gabrieleflorio01@gmail.com\"\n}",
+          "raw": "{\n    \n}",
           "options": {
             "raw": {
               "language": "json"
@@ -113,6 +113,39 @@
           "path": [
             "sla-detector",
             "breach_stats"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "testqueryprometheus",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/prometheus/api/v1/query?query=total_flights_fetched",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "prometheus",
+            "api",
+            "v1",
+            "query"
+          ],
+          "query": [
+            {
+              "key": "query",
+              "value": "time()-last_successful_update_timestamp",
+              "disabled": true
+            },
+            {
+              "key": "query",
+              "value": "total_flights_fetched"
+            }
           ]
         }
       },

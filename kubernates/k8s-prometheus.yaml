@@ -34,8 +34,17 @@ spec:
       containers:
         - name: prometheus
           image: prom/prometheus:latest
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
           args:
             - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--web.external-url=/prometheus/"
+            - "--web.route-prefix=/"
           ports:
             - containerPort: 9090
           volumeMounts:
