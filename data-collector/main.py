@@ -13,7 +13,7 @@ import user_manager_pb2_grpc
 import data_collector_pb2
 import data_collector_pb2_grpc
 from prometheus_client import start_http_server, Gauge, Counter
-
+import psutil
 
 NODE_NAME = os.getenv('NODE_NAME', 'unknown_node')
 SERVICE_NAME = 'data_collector'
@@ -393,7 +393,7 @@ def get_average_flights():
 if __name__ == '__main__':
     start_metrics_server()
 
-    CPU_USAGE.labels(service=SERVICE_NAME, node=NODE_NAME).set_function(lambda: os.getloadavg()[0] * 10)
+    CPU_USAGE.labels(service=SERVICE_NAME, node=NODE_NAME).set_function(lambda: psutil.cpu_percent(interval=1))
 
     grpc_thread = threading.Thread(target=run_grpc_server)
     grpc_thread.start()

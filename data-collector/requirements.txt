@@ -7,3 +7,4 @@ APScheduler
 protobuf
 confluent_kafka
 prometheus_client
+psutil

@@ -8,7 +8,7 @@ data:
       - name: "db_update_slow_data_collector"
         query: "flight_db_update_duration_seconds"
         min: 0
-        max: 10.0
+        max: 5.0
       - name: "cpu_usage_high_data_collector"
         query: "data_collector_cpu_usage_percent"
         min: 0
@@ -16,11 +16,11 @@ data:
       - name: "db_update_slow_user_manager"
         query: "user_manager_db_update_duration_seconds"
         min: 0
-        max: 1.0
-      - name: "user_manager_db_update_duration_seconds"
+        max: 5.0
+      - name: "total_user_high_user_manager"
         query: "total_user"
         min: 0
-        max: 10.0
+        max: 1000.0
       - name: "cpu_usage_high_user_manager"
         query: "user_manager_cpu_usage_percent"
         min: 0
@@ -28,11 +28,11 @@ data:
       - name: "deduplication_cache_size_high_user_manager"
         query: "deduplication_cache_size"
         min: 0
-        max: 10
+        max: 20
       - name: "last_update_delay_data_collector"
         query: "time()-last_successful_update_timestamp"
         min: 0
-        max: 30
+        max: 43200
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -6,6 +6,7 @@ import sys
 from concurrent import futures
 import grpc
 import threading
+import psutil
 sys.path.append(os.path.join(os.getcwd(), 'proto'))
 
 import user_manager_pb2       
@@ -211,7 +212,7 @@ def rmv_user():
 if __name__ == '__main__':
     start_metrics_server()
 
-    CPU_USAGE.labels(service=SERVICE_NAME, node=NODE_NAME).set_function(lambda: os.getloadavg()[0] * 10)
+    CPU_USAGE.labels(service=SERVICE_NAME, node=NODE_NAME).set_function(lambda: psutil.cpu_percent(interval=1))
     CACHE_SIZE.labels(service=SERVICE_NAME, node=NODE_NAME).set(0)
     server = threading.Thread(target=run_grpc_server)
     server.start()

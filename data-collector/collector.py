@@ -14,7 +14,7 @@ API_BASE_URL = "https://opensky-network.org/api"
 NODE_NAME = os.getenv('NODE_NAME', 'unknown_node')
 SERVICE_NAME = 'data_collector'
 
-cb = circuitBreaker.CircuitBreaker(failure_threshold=3, recovery_timeout=1)
+cb = circuitBreaker.CircuitBreaker(failure_threshold=5, recovery_timeout=30)
 CB_REJECTIONS = Counter('circuit_breaker_rejections_total', 'Number of requests rejected mainly because Circuit Breaker was OPEN', ['service', 'target_host']
 )
 def get_access_token():
