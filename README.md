@@ -25,33 +25,33 @@ Nota: Non è necessario modificare direttamente il codice Python, poiché le var
 ## Avvio del Progetto
 Per avviare l'intera suite di microservizi, posizionarsi nella directory root del progetto ed eseguire la seguente sequenza di comandi:
 1. Crea il cluster e installa l'ingress controller NGINX:
-   -kind delete cluster --name hw3-cluster
-   -cd .\kind\
-   -kind create cluster --name hw3-cluster --config kind-config.yaml
-   -kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-   -kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=90s
-   -cd ..
+   * kind delete cluster --name hw3-cluster
+   * cd .\kind\
+   * kind create cluster --name hw3-cluster --config kind-config.yaml
+   * kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+   * kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=90s
+   * cd ..
 3. Compila le immagini dei microservizi:
-   -docker build -t user-manager:latest -f user-manager/Dockerfile .
-   -docker build -t data-collector:latest -f data-collector/Dockerfile .
-   -docker build -t alert-system:latest -f alertSystem/Dockerfile .
-   -docker build -t alert-notifier:latest -f alertSystemNotifier/Dockerfile .
-   -docker build -t sla-breach-detector:latest ./sla-detector
+   * docker build -t user-manager:latest -f user-manager/Dockerfile .
+   * docker build -t data-collector:latest -f data-collector/Dockerfile .
+   * docker build -t alert-system:latest -f alertSystem/Dockerfile .
+   * docker build -t alert-notifier:latest -f alertSystemNotifier/Dockerfile .
+   * docker build -t sla-breach-detector:latest ./sla-detector
 5. Caricamento immagini nel Cluster
-   -kind load docker-image user-manager:latest --name hw3-cluster
-   -kind load docker-image data-collector:latest --name hw3-cluster
-   -kind load docker-image alert-system:latest --name hw3-cluster
-   -kind load docker-image alert-notifier:latest --name hw3-cluster
-   -kind load docker-image sla-breach-detector:latest --name hw3-cluster
+   * kind load docker-image user-manager:latest --name hw3-cluster
+   * kind load docker-image data-collector:latest --name hw3-cluster
+   * kind load docker-image alert-system:latest --name hw3-cluster
+   * kind load docker-image alert-notifier:latest --name hw3-cluster
+   * kind load docker-image sla-breach-detector:latest --name hw3-cluster
 7. Deploy dei manifest kubernetes
-   -cd .\kubernates\
-   -kubectl apply -f k8s-secrets.yaml
-   -kubectl apply -f k8s-configmaps.yaml
-   -kubectl apply -f k8s-infra.yaml
-   -kubectl apply -f k8s-app.yaml
-   -kubectl apply -f k8s-ingress.yaml
-   -kubectl apply -f k8s-prometheus.yaml
-   -kubectl apply -f k8s-sla.yaml
+   * cd .\kubernates\
+   * kubectl apply -f k8s-secrets.yaml
+   * kubectl apply -f k8s-configmaps.yaml
+   * kubectl apply -f k8s-infra.yaml
+   * kubectl apply -f k8s-app.yaml
+   * kubectl apply -f k8s-ingress.yaml
+   * kubectl apply -f k8s-prometheus.yaml
+   * kubectl apply -f k8s-sla.yaml
 
 ## Testing e Utilizzo
 Nella directory **root** del progetto sono presenti 3 file di collezione **Postman**. Questi file sono preconfigurati per testare tutti gli endpoint esposti dai microservizi.
